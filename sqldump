@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Example config file, assumed to be found as 'config/example'
+#
+# server_host="db.example.com"
+# server_user="example_user"
+# server_password="password123"
+# dumpfile="/home/example_user/my_big_sql_dump.sql"
+#
+# This allows you to run 
+# $> mysql_backup example
+
+if [ -f "config/${1}" ]; then
+	echo "Found config file for: ${1}"
+	source ${1}
+
+	if [[ -z $server_host || -z $server_user || -z $server_password || -z $dumpfile ]]; then
+	  echo 'Config file did not contain all desired variables.'
+	  exit 1
+	else
+		echo "Dumping all databases to ${dumpfile} (this may take a while..)"
+		mysqldump \ 
+			--all-databases \
+			--single-transaction \
+			--host=${server_host} \
+			--user=${server_user} \
+			--password=${server_password} \
+			--protocol=TCP > ${dumpfile}
+	fi
+else
+	echo "Could not find config file for: ${1}"
+fi
