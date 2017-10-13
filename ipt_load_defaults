@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Script to quickly revert my iptables setup to the defaults
+
+IPT=$(which iptables)
+
+allowedIncomingPorts=( 80 44 22 )
+allowedOutgoingPorts=( 80 443 9418 )
+
+#########################################
+#    Flush everything and initialize    #
+#########################################
+
+$IPT -F
+$IPT -t nat -F
+$IPT -X
+$IPT -P FORWARD DROP
+$IPT -P INPUT   DROP
+$IPT -P OUTPUT  ACCEPT
+
+# Allow already made connections through
+$IPT -A INPUT -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPT -A OUTPUT -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+for port in "${allowedIncomingPorts[@]}"
+do
+    $IPT -A INPUT -p tcp --dport ${port} -j ACCEPT
+    $IPT -A OUTPUT -p tcp --dport ${port} -m state --state ESTABLISHED,RELATED -j ACCEPT
+done
+
+
+for port in "${allowedOutgoingPorts[@]}"
+do
+    $IPT -A OUTPUT -p tcp --dport ${port} -m state --state NEW,ESTABLISHED -j ACCEPT
+    $IPT -A INPUT -p tcp --sport ${port} -m state --state ESTABLISHED -j ACCEPT
+done
+
+
+#############
+#    DNS    #
+#############
+
+$IPT -A INPUT -p udp --sport 53 -m state  --state ESTABLISHED,RELATED -j ACCEPT
+$IPT -A OUTPUT -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+######################################
+#    Docker forwarding is allowed    #
+#    (uncomment when needed)         #
+######################################
+
+# $IPT -A FORWARD -i docker0 -o eth0 -j ACCEPT
+# $IPT -A FORWARD -i eth0 docker0 -j ACCEPT
+
+##########################
+#    Loopback is king    #
+##########################
+
+$IPT -A INPUT -i lo -p all -j ACCEPT
+
+##########################################
+#    Logging dropped inbound packages    #
+##########################################
+
+$IPT -N INPUTLOGGING
+$IPT -A INPUT -j INPUTLOGGING
+$IPT -A INPUTLOGGING -m limit --limit 2/min -j LOG --log-prefix "$IPT-Dropped: " --log-level 4
+$IPT -A INPUTLOGGING -j DROP
+
+$IPT -N OUTPUTLOGGING
+$IPT -A OUTPUT -j OUTPUTLOGGING
+$IPT -A OUTPUTLOGGING -m limit --limit 2/min -j LOG --log-prefix "$IPT-Dropped: " --log-level 4
+$IPT -A OUTPUTLOGGING -j DROP

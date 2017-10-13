@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Quick 'block ip addresses' script
+# usage: ipt_block <file with ip addresses>
+
+if [[ $EUID -ne 0 ]]; then
+  echo "This script must be run with root privilegs"
+  exit 1
+fi
+
+while read ip
+do
+  iptables -D INPUT -s $ip -j DROP 2>/dev/null # Oi! What race conditions are you talking about?
+  iptables -A INPUT -s $ip -j DROP
+done < $1
