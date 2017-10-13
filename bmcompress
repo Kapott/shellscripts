@@ -1,0 +1,95 @@
+#!/bin/bash
+
+# Quick and dirty script I used for benchmarking several different compression techniques
+
+export GZIP=-9
+export XZ_OPT=-9
+export BZIP=-9
+
+echo "Single thread gzip"
+echo "------------------------"
+(time tar -czf ${1}.tar.gz ${2}) 2>&1
+fsize=$(du -ksh ${2})
+printf "\n"
+echo "Before: ${fsize}"
+nsize=$(du -ksh ${1}.tar.gz)
+echo "After:  ${nsize}"
+rm ${1}.tar.gz
+printf "\n\n"
+
+echo "Single thread bzip2"
+echo "------------------------"
+(time tar -cjf ${1}.tar.bz2 ${2}) 2>&1
+fsize=$(du -ksh ${2})
+printf "\n"
+echo "Before: ${fsize}"
+nsize=$(du -ksh ${1}.tar.bz2)
+echo "After:  ${nsize}"
+rm ${1}.tar.bz2
+printf "\n\n"
+
+echo "Single thread xz"
+echo "------------------------"
+(time tar -cJf ${1}.tar.xz ${2}) 2>&1
+fsize=$(du -ksh ${2})
+printf "\n"
+echo "Before: ${fsize}"
+nsize=$(du -ksh ${1}.tar.xz)
+echo "After:  ${nsize}"
+rm ${1}.tar.xz
+printf "\n\n"
+
+echo "Multi thread gzip (8 cores)"
+echo "------------------------"
+(time tar -I pigz -cf ${1}.tar.gz ${2}) 2>&1
+fsize=$(du -ksh ${2})
+printf "\n"
+echo "Before: ${fsize}"
+nsize=$(du -ksh ${1}.tar.gz)
+echo "After:  ${nsize}"
+rm ${1}.tar.gz
+printf "\n\n"
+
+echo "Multi thread bz2 (8 cores)"
+echo "------------------------"
+(time tar -I pbzip2 -cf ${1}.tar.bz2 ${2}) 2>&1
+fsize=$(du -ksh ${2})
+printf "\n"
+echo "Before: ${fsize}"
+nsize=$(du -ksh ${1}.tar.bz2)
+echo "After:  ${nsize}"
+rm ${1}.tar.bz2
+printf "\n\n"
+
+echo "Multi thread xz (8 cores)"
+echo "------------------------"
+(time tar -I pxz -cf ${1}.tar.xz ${2}) 2>&1
+fsize=$(du -ksh ${2})
+printf "\n"
+echo "Before: ${fsize}"
+nsize=$(du -ksh ${1}.tar.xz)
+echo "After:  ${nsize}"
+rm ${1}.tar.xz
+printf "\n\n"
+
+echo "Multi thread lrzip (ZPAQ) (8 cores)"
+echo "------------------------"
+(time lrztar -z -o ${1}.tar.lrz ${2}) 2>&1
+fsize=$(du -ksh ${2})
+printf "\n"
+echo "Before: ${fsize}"
+nsize=$(du -ksh ${1}.tar.lrz)
+echo "After:  ${nsize}"
+rm ${1}.tar.lrz
+printf "\n\n"
+
+echo "Multi thread lrzip (LZO) (8 cores)"
+echo "------------------------"
+(time lrztar -l -o ${1}.tar.lrz ${2}) 2>&1
+fsize=$(du -ksh ${2})
+printf "\n"
+echo "Before: ${fsize}"
+nsize=$(du -ksh ${1}.tar.lrz)
+echo "After:  ${nsize}"
+rm ${1}.tar.lrz
+printf "\n\n"
