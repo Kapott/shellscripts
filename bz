@@ -1,0 +1,3 @@
+#!/bin/bash
+command -v pbzip2 >/dev/null 2>&1 || { echo >&2 "I require pbzip2 but it's not installed.  Aborting."; exit 1; }
+env BZIP=-9 tar -I pbzip2 -cf ${1}.tar.bz2 ${2}
