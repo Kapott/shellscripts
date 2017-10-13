@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Usage: batch_lookup_ips <file with ips>
+
+while read ip
+do
+  name=$(nslookup $ip| grep "name ="|sed 's/.*=//')
+  if [[ -n "$name" ]]; then
+    echo $name
+  fi
+done < $1
