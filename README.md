@@ -30,7 +30,7 @@ _usage:_ `http_status <url>`
 
 ## ipt_block
 
-Blocks an ip address, or ip addresses listed in a file, seperated by newlines.
+Blocks an ip address, or ip addresses listed in a file, separated by newlines.
 
 _usage:_ `ipt_block <ip_address or file_with_ips>`
 
