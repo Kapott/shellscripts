@@ -6,6 +6,6 @@ while read ip
 do
   name=$(nslookup $ip| grep "name ="|sed 's/.*=//')
   if [[ -n "$name" ]]; then
-    echo $name
+    printf "${ip} ${name} \n"
   fi
 done < $1
