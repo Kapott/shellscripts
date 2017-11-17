@@ -1,4 +1,4 @@
 #!/bin/bash
 # Returns the HTTP status code for the given url
 # Usage: http_status <url>
-curl -Lw '%{http_code}' -s -o /dev/null -I ${1}
+curl -Lw '%{http_code}' -s -o /dev/null -I ${1} ; printf "\n"
