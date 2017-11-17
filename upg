@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# If we're not already root, run this script as root
+if [[ $EUID -ne 0 ]]; then
+  exec sudo /bin/bash "$0" "$@"
+fi
+
+# Update cache if it's older than 10m
+if [ "$[$(date +%s) - $(stat -c %Z /var/lib/apt/periodic/update-success-stamp)]" -ge 600000 ]; then
+  printf "Cache is stale, updating...\n"
+  apt-get update 2>&1 > /var/apt_update.log
+fi
+
+printf "Distribution dependency upgrade...\n"
+apt-get dist-upgrade -qq
+
+printf "Single-package upgrade...\n"
+apt-get upgrade -qq
+
+printf "Removing superfluous packages...\n"
+apt-get autoremove -qq
+
+if [ -f /var/run/reboot-required ]; then
+  printf "\nReboot required!\n"
+fi
+
+printf "Done!\n"
+
+
+
