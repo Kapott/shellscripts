@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# require sudo apt-get install libnotify-bin
+command -v notify-send >/dev/null 2>&1 || { echo >&2 "I require notify-send but it's not installed.  Aborting.";
+exit 1; }
+
+msg_pom_start="Starting pomodoro.. (25m)"
+msg_pom_end="Pomodoro ended!"
+msg_break_end="Break ended!"
+msg_shortbreak_start="Starting break..."
+msg_longbreak_start="Long break started (20m)"
+
+notify-send POMODORO "${msg_pom_start}" && sleep 1500 && notify-send POMODORO "${msg_pom_end}"; aplay
+"${HOME}/bin/sounds/amulet.wav"
