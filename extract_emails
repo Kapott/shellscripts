@@ -1,0 +1,4 @@
+#!/bin/bash
+# This script is basically just a 'grep' which I cant be bothered to look up every time
+
+grep -E -o "\b[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b" $1
