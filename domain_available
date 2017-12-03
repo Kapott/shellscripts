@@ -1,0 +1,26 @@
+#!/bin/bash
+# Script works with globbing, and requires 'whois' to be installed.
+# e.g.
+#
+# domain_available kapott.com
+# domain_available number{1..5}.{com,net,org,info,software}
+#
+# and yes, you can also just "brute-force" 3letter-tld's...
+#
+# domain_available {a-z}{a-z}{a-z}.{com,net,org}
+
+trap 'exit 1' INT TERM EXIT
+
+for d in $@;
+do
+	if host $d | grep "NXDOMAIN" >&/dev/null; then
+		if whois $d | grep -E "(No match for|NOT FOUND)" >&/dev/null; then
+			echo "$d available";
+		else
+			echo "$d taken";
+		fi
+	else
+		echo "$d taken";
+	fi
+	sleep 0.1;
+done
