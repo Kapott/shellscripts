@@ -1,0 +1,10 @@
+#!/bin/bash
+# Generate a alphanumeric password of n length
+
+if [ -z "$1" ]; then
+  charnum=24
+else
+  charnum=$1
+fi
+
+head /dev/urandom | tr -dc A-Za-z0-9 | head -c ${charnum} ; echo ''
