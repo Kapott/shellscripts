@@ -1,0 +1,4 @@
+#!/bin/bash
+# Recursively grep through a directory structure to find emails.
+# Useful for when you mass-downloaded some site with wget -m or some-such
+grep -rEo "\b[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b"
