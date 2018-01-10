@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Create Architecture Decision Record
+#
+# Creates a new text document with markdown formatting,
+# according to the Michael Nygard template style.
+#
+# e.g.
+# 2018-01-01 Change client UA detection to server detection.md
+#
+# More info: https://github.com/joelparkerhenderson/architecture_decision_record
+
+isodate=$(date "+%Y-%m-%d")
+extension=".md"
+name=$@
+fullname="${isodate} ${name}${extension}"
+
+touch "${fullname}"
+cat <<HEREDOC >> "${fullname}"
+**Title:**
+(Short, like git commit msg)
+
+**Status:**
+(proposed/accepted/rejected/deprecated/superseded etc)
+
+**Context:**
+What is the issue that we're seeing that is motivating this decision or change?
+
+**Decision:**
+What is the change that we're actually proposing or doing.
+
+**Consequences:**
+What becomes easier or more difficult to do because of this change?
+HEREDOC
+
